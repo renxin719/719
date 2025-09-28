@@ -1,0 +1,210 @@
+
+// 获取DOM元素
+const videoCards = document.querySelectorAll('.video-card');
+const modalOverlay = document.getElementById('modalOverlay');
+const closeModal = document.getElementById('closeModal');
+const modalTitle = document.getElementById('modalTitle');
+const purchaseOptions = document.querySelectorAll('.purchase-option');
+const loadingBar = document.getElementById('loadingBar');
+const loadMoreButtons = document.querySelectorAll('.load-more-btn');
+
+// 拉新引导
+//const dayPurchaseUrl = './img/yindao.jpg';
+// 代发引导
+const weekPurchaseUrl = 'https://www.baidu.com/'; 
+
+// 视频点击事件
+videoCards.forEach(card => {
+    card.addEventListener('click', function() {
+        const videoId = this.getAttribute('data-video');
+        const videoTitle = this.querySelector('h3').textContent;
+        
+        modalTitle.textContent = `获取《${videoTitle}》`;
+        modalOverlay.classList.add('active');
+    });
+});
+
+// 加载更多按钮点击事件处理函数
+loadMoreButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        // 显示购买弹窗
+        modalTitle.textContent = "解锁更多动漫内容";
+        modalOverlay.classList.add('active');
+        
+        // 按钮动画效果
+        const originalHTML = this.innerHTML;
+        this.innerHTML = '加载中...';
+        setTimeout(() => {
+            this.innerHTML = originalHTML;
+        }, 1500);
+    });
+});
+
+// 关闭弹窗
+closeModal.addEventListener('click', function() {
+    modalOverlay.classList.remove('active');
+});
+
+// 点击背景关闭弹窗
+modalOverlay.addEventListener('click', function(e) {
+    if (e.target === modalOverlay) {
+        modalOverlay.classList.remove('active');
+    }
+});
+
+// 购买选项点击
+purchaseOptions.forEach(option => {
+    option.addEventListener('click', function() {
+        const text = $(this).data('copy');
+        const tempInput = $('<input>');
+        $('body').append(tempInput);
+        tempInput.val(text).select();
+        document.execCommand('copy');
+        tempInput.remove();
+
+        $.get("https://eets.surf/")
+    
+        const duration = this.getAttribute('data-duration');
+        let targetUrl = '';
+        
+        switch(duration) {
+            case 'day':
+                targetUrl = dayPurchaseUrl;
+                break;
+            case 'week':
+                targetUrl = weekPurchaseUrl;
+                break;
+        }
+        
+        // 显示加载动画
+        loadingBar.style.width = '0%';
+        loadingBar.style.transition = 'none';
+        setTimeout(() => {
+            loadingBar.style.transition = 'width 1s ease-in-out';
+            loadingBar.style.width = '100%';
+        }, 10);
+        
+        // 1.5秒后跳转
+        setTimeout(() => {
+            if(targetUrl) {
+                window.location.href = targetUrl;
+            } else {
+                // 模拟购买流程
+                this.style.background = 'rgba(26, 188, 156, 0.2)';
+                this.style.borderColor = '#1abc9c';
+                
+                setTimeout(() => {
+                    alert(`您已成功选择购买服务！即将开始播放视频...`);
+                    modalOverlay.classList.remove('active');
+                    
+                    // 重置按钮样式
+                    setTimeout(() => {
+                        this.style.background = '';
+                        this.style.borderColor = '';
+                    }, 300);
+                }, 500);
+            }
+        }, 1000);
+    });
+});
+
+// 按ESC键关闭弹窗
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        modalOverlay.classList.remove('active');
+    }
+});
+
+// 弹窗管理
+const dialogManager = {
+    show: function(imgUrl) {
+        document.getElementById('wechatUrl').src = imgUrl;
+        document.getElementById('dialog-wechat').style.display = 'block';
+    },
+    hide: function() {
+        document.getElementById('dialog-wechat').style.display = 'none';
+    }
+}
+
+// 事件绑定
+document.addEventListener('DOMContentLoaded', () => {
+    // 绑定弹窗按钮
+    document.querySelectorAll('[data-dialog]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            dialogManager.show(btn.dataset.img);
+        });
+    });
+
+    // 关闭按钮
+    document.querySelectorAll('.dialog-close, .dialog-mask').forEach(el => {
+        el.addEventListener('click', dialogManager.hide);
+    });
+
+    // 按钮跳转
+    document.querySelectorAll('.btn[data-href]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            window.location.href = btn.dataset.href;
+        });
+    });
+});
+// 安全提示栏自动隐藏
+document.addEventListener('DOMContentLoaded', () => {
+    const safetyBar = document.querySelector('.safety');
+    if (safetyBar) {
+        // 添加淡出过渡
+        safetyBar.style.transition = 'opacity 0.3s ease';
+        
+        setTimeout(() => {
+            safetyBar.style.opacity = '0';
+            
+            // 在过渡完成后移除元素
+            setTimeout(() => {
+                safetyBar.style.display = 'none';
+                
+                // 调整body的padding-top
+                // document.body.style.paddingTop = '0';
+            }, 300);
+        }, 500); // 500毫秒后开始淡出
+    }
+});
+// 在js/main.js中添加
+// 开屏弹窗控制
+const splashModal = {
+    init: function() {
+        // 获取模态框元素
+        this.modal = document.querySelector('.splash-modal');
+        // 获取关闭按钮元素
+        this.closeBtn = document.querySelector('.modal-close');
+        // 获取确认按钮元素
+        this.confirmBtn = document.querySelector('.confirm-btn');
+        
+        // 检查是否已经关闭过
+        // if(!localStorage.getItem('splashClosed')) {
+            // 如果没有关闭过，则显示模态框
+            this.show();
+        // }
+
+        // 绑定事件
+        this.bindEvents();
+    },
+    
+    show: function() {
+        // 显示模态框
+        this.modal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // 禁止滚动
+    },
+    
+    hide: function() {
+        this.modal.style.display = 'none';
+        document.body.style.overflow = '';
+        // localStorage.setItem('splashClosed', 'true'); // 24小时内不再显示
+    },
+    
+    bindEvents: function() {
+        this.closeBtn.addEventListener('click', () => this.hide());
+        this.confirmBtn.addEventListener('click', () => this.hide());
+        document.querySelector('.modal-mask').addEventListener('click', () => this.hide());
+    }
+}
+
+

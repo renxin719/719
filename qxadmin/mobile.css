@@ -1,0 +1,125 @@
+/**
+ * 后台手机自适应样式
+ */
+
+/* 小屏幕适配 */
+@media screen and (max-width: 768px) {
+    /* 导航菜单适配 */
+    .layui-layout-admin .layui-side {
+        width: 0;
+        overflow: hidden;
+        transition: width 0.3s;
+    }
+    
+    .layui-layout-admin .layui-side.show {
+        width: 200px;
+    }
+    
+    .layui-layout-admin .layui-body,
+    .layui-layout-admin .layui-footer {
+        left: 0;
+        transition: left 0.3s;
+    }
+    
+    .layui-layout-admin .layui-body.shrink,
+    .layui-layout-admin .layui-footer.shrink {
+        left: 200px;
+    }
+    
+    /* 顶部菜单样式 */
+    .layui-layout-admin .layui-header .mobile-menu {
+        display: block;
+    }
+    
+    /* 卡片样式调整 */
+    .layui-col-xs12 {
+        margin-bottom: 10px;
+    }
+    
+    /* 表单适配 */
+    .layui-form-label {
+        width: 80px;
+        padding: 8px 8px;
+    }
+    
+    .layui-input-block {
+        margin-left: 100px;
+    }
+    
+    /* 图表适配 */
+    .dashboard-chart {
+        height: 240px;
+    }
+    
+    /* 表格适配 */
+    .layui-table th, 
+    .layui-table td {
+        padding: 5px 8px;
+    }
+    
+    /* 统计卡片调整 */
+    .stat-card {
+        padding: 8px 0;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 20px;
+    }
+}
+
+/* 超小屏幕适配 */
+@media screen and (max-width: 480px) {
+    .layui-layout-admin .layui-logo {
+        font-size: 14px;
+    }
+    
+    .layui-nav .layui-nav-item a {
+        padding: 0 10px;
+    }
+    
+    /* 表单适配 */
+    .layui-form-label {
+        width: 60px;
+        padding: 8px 5px;
+        font-size: 12px;
+    }
+    
+    .layui-input-block {
+        margin-left: 80px;
+    }
+    
+    /* 表格适配 */
+    .layui-table {
+        font-size: 12px;
+    }
+    
+    .layui-table th, 
+    .layui-table td {
+        padding: 3px 5px;
+    }
+    
+    /* 卡片头部 */
+    .layui-card-header {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    /* 状态指示器 */
+    .stat-card .stat-number {
+        font-size: 18px;
+    }
+    
+    .stat-card .stat-title {
+        font-size: 12px;
+    }
+    
+    /* 系统信息调整 */
+    .system-info-label {
+        width: 80px;
+        font-size: 12px;
+    }
+    
+    .system-info-value {
+        font-size: 12px;
+    }
+}

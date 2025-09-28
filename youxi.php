@@ -1,0 +1,1022 @@
+<?php 
+include_once 'config.php'; // 包含配置文件以使用get_setting函数
+$popup_url = get_setting('popup_url'); // 获取后台设置的弹窗URL
+include_once 'header.php'; 
+?>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #000;
+            color: #f5f5f5;
+            min-height: 100vh;
+            padding: 10px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background-color: #00ff00;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            position: relative;
+        }
+        
+        .logo-icon::before {
+            content: "▲";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-size: 14px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #00ff00, #00ccff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 12px;
+        }
+        
+        nav a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        
+        nav a:hover, nav a.active {
+            color: #fff;
+            background: rgba(0, 255, 0, 0.2);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin: 15px 0 20px;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #00ff00, #00ccff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, #00ff00, #00ccff);
+        }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            flex-grow: 1;
+        }
+        
+        .game-card {
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 255, 0, 0.3);
+        }
+        
+        .premium-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #00aa00;
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+        
+        .thumbnail {
+            height: 160px;
+            width: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .thumbnail::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            transition: background 0.3s;
+        }
+        
+        .game-card:hover .thumbnail::after {
+            background: rgba(0, 255, 0, 0.2);
+        }
+        
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            z-index: 2;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .play-icon::before {
+            content: "▶";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-40%, -50%);
+            color: #000;
+            font-size: 16px;
+        }
+        
+        .game-card:hover .play-icon {
+            opacity: 1;
+            background-color: #00ff00;
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.7);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .game-info {
+            padding: 12px;
+        }
+        
+        .game-info h3 {
+            font-size: 1rem;
+            margin-bottom: 6px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .game-info p {
+            color: #aaa;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            height: 36px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 0.75rem;
+        }
+        
+        .game-tag {
+            background: rgba(0, 170, 0, 0.2);
+            color: #00ff00;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .load-more {
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .load-more-btn {
+            background: rgba(0, 255, 0, 0.2);
+            color: #f5f5f5;
+            border: 1px solid #00ff00;
+            padding: 12px 40px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .load-more-btn:hover {
+            background: rgba(0, 255, 0, 0.4);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .load-more-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .load-more-btn:hover::after {
+            left: 100%;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .purchase-modal {
+            background: #111;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            border: 1px solid #333;
+            transform: scale(0.9);
+            transition: transform 0.4s;
+            position: relative;
+        }
+        
+        .modal-overlay.active .purchase-modal {
+            transform: scale(1);
+        }
+        
+        .purchase-modal h2 {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+        
+        .purchase-modal .subtitle {
+            color: #aaa;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+        
+        .purchase-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .purchase-option {
+            background: rgba(40, 40, 40, 0.9);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .purchase-option:hover {
+            background: rgba(0, 255, 0, 0.15);
+            border-color: #00ff00;
+        }
+        
+        .purchase-option h3 {
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+            color: #00ff00;
+        }
+        
+        .purchase-option .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #00ccff;
+        }
+        
+        .purchase-option .desc {
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+        
+        .close-modal {
+            background: rgba(60, 60, 60, 0.9);
+            color: #ddd;
+            border: 1px solid #444;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+            width: 100%;
+        }
+        
+        .close-modal:hover {
+            background: rgba(0, 255, 0, 0.2);
+            color: #fff;
+        }
+        
+        .loading-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: #00ff00;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px 0 12px;
+            color: #666;
+            font-size: 0.8rem;
+            border-top: 1px solid #222;
+            margin-top: 15px;
+        }
+        
+        /* 浮动按钮样式 */
+        .float-btns {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 9999;
+        }
+        
+        .float-btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .float-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        
+        .float-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-payment {
+            background: #ff4757;
+            border: 2px solid #ff6b81;
+        }
+        
+        .btn-refund {
+            background: #2ed573;
+            border: 2px solid #7bed9f;
+        }
+        
+        .btn-complaint {
+            background: #3742fa;
+            border: 2px solid #5352ed;
+        }
+                        /* 操作按钮容器 */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            gap: 10px;
+        }
+        .btn-payment {
+            background-color: #ff6b6b;
+            color: white;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1100px) {
+            .game-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .game-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+            
+            .thumbnail {
+                height: 140px;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+            }
+            
+            /* 浮动按钮适配 */
+            .float-btns {
+                bottom: 15px;
+                right: 15px;
+                gap: 10px;
+            }
+            
+            .float-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+                min-width: 100px;
+            }
+        }
+        
+        /* 手机设备优化 */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .container {
+                padding: 8px;
+            }
+            
+            header {
+                padding: 10px 0;
+                margin-bottom: 12px;
+            }
+            
+            .logo-icon {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .logo-icon::before {
+                font-size: 12px;
+            }
+            
+            .logo h1 {
+                font-size: 1.3rem;
+            }
+            
+            nav a {
+                font-size: 0.85rem;
+                padding: 4px 8px;
+            }
+            
+            .section-title {
+                font-size: 1.4rem;
+                margin: 10px 0 15px;
+            }
+            
+            .game-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .game-card {
+                border-radius: 6px;
+            }
+            
+            .premium-badge {
+                top: 6px;
+                right: 6px;
+                padding: 2px 5px;
+                font-size: 0.65rem;
+            }
+            
+            .thumbnail {
+                height: 110px;
+            }
+            
+            .play-icon {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .play-icon::before {
+                font-size: 12px;
+            }
+            
+            .game-info {
+                padding: 8px;
+            }
+            
+            .game-info h3 {
+                font-size: 0.9rem;
+                margin-bottom: 4px;
+                white-space: normal;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                height: 2.4em;
+                line-height: 1.2;
+            }
+            
+            .game-info p {
+                display: none;
+            }
+            
+            .meta {
+                font-size: 0.7rem;
+            }
+            
+            .game-tag {
+                font-size: 0.6rem;
+                padding: 2px 6px;
+            }
+            
+            .load-more-btn {
+                padding: 10px 30px;
+                font-size: 1rem;
+            }
+            
+            .purchase-modal {
+                padding: 18px;
+                max-width: 95%;
+            }
+            
+            .purchase-modal h2 {
+                font-size: 1.2rem;
+            }
+            
+            .purchase-options {
+                gap: 10px;
+                margin: 15px 0;
+            }
+            
+            .purchase-option {
+                padding: 12px;
+            }
+            
+            .purchase-option h3 {
+                font-size: 1.1rem;
+            }
+            
+            .purchase-option .price {
+                font-size: 1.3rem;
+            }
+            
+            .purchase-option .desc {
+                font-size: 0.8rem;
+            }
+            
+            .close-modal {
+                padding: 7px 14px;
+                font-size: 0.85rem;
+            }
+            
+            footer {
+                padding: 20px 0 10px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+<style>.Po4BvhR1CK2tJaywJ6AN path {
+  fill: var(--icon-path-fill);
+}
+.Oz4yDjua3Qe6thqkZYf_ path {
+  transition: 0.2s all;
+}
+.Oz4yDjua3Qe6thqkZYf_:hover path {
+  fill: var(--icon-hover-fill);
+}
+</style><style>/* ！！！切勿直接改动该文件，该文件由 generator.ts 自动生成！！！ */
+/* !!! DONT MODIFY THIS FILE DIRECTLY, THIS FILE IS GENERATED BY generator.ts AUTOMATICALLY !!! */
+.ibW4Oa5B7s2zJKKZ4pCg {
+  user-select: none;
+}
+.AtqKyJetjrG4smuk35Np {
+  max-width: 346px;
+  width: auto;
+  height: 36px;
+  background-color: var(--quark-style-white-color, #fff);
+  padding-left: 10px;
+  padding-right: 4px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1px solid var(--quark-style-gray-20-color, rgba(6, 10, 38, 0.12));
+  box-shadow: 0 12px 32px -6px var(--quark-style-gray-30-fixed-color, rgba(6, 10, 38, 0.24));
+  border-radius: 10px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .g6iGsZa_KHMeW2yICzQQ {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  margin-right: 6px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .e4UXx38MPgfHdym_Lzt0 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  height: 28px;
+  padding: 0 6px;
+  margin-right: 2px;
+  border-radius: 6px;
+  column-gap: 4px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .e4UXx38MPgfHdym_Lzt0:hover:not(.ibW4Oa5B7s2zJKKZ4pCg .kNOcXLDT_cCrcoY8LTm8) {
+  background: var(--quark-style-gray-10-color, rgba(6, 10, 38, 0.06));
+}
+.ibW4Oa5B7s2zJKKZ4pCg .kNOcXLDT_cCrcoY8LTm8 {
+  cursor: default;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .kNOcXLDT_cCrcoY8LTm8 .Va3czASiR9Zztyl_lD4M {
+  color: var(--quark-style-gray-40-color, rgba(6, 10, 38, 0.4)) !important;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .e4UXx38MPgfHdym_Lzt0 .Va3czASiR9Zztyl_lD4M {
+  font-size: 12px;
+  color: var(--quark-style-gray-color, #060A26);
+  line-height: 16px;
+  white-space: nowrap;
+  position: relative;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .llw0qsmiI_08u93bFdNg {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  overflow: visible !important;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .LEo8kpqIERehkv8AhAfG {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 6px;
+  overflow: visible !important;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .LEo8kpqIERehkv8AhAfG:hover {
+  background: var(--quark-style-gray-10-color, rgba(6, 10, 38, 0.06));
+}
+.ibW4Oa5B7s2zJKKZ4pCg .zoNmooxAnbLEJSN8m1Jg {
+  box-sizing: border-box;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 110px;
+  max-height: 136px;
+  height: auto;
+  top: 36px;
+  right: -5px;
+  padding: 4px 0;
+  background-color: var(--quark-style-white-color, #fff);
+  border: 1px solid var(--quark-style-gray-20-color, rgba(6, 10, 38, 0.12));
+  box-shadow: 0 4px 16px -6px var(--quark-style-gray-20-fixed-color, rgba(6, 10, 38, 0.12));
+  border-radius: 8px;
+  overflow: visible !important;
+  row-gap: 4px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .O1imPofna4elG_8NcQnR {
+  top: -77px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .mdH0IY7jS3Swn5vdX6tz {
+  width: 102px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  column-gap: 8px;
+  border-radius: 6px;
+  padding: 0 6px;
+  box-sizing: border-box;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .mdH0IY7jS3Swn5vdX6tz:hover:not(.ibW4Oa5B7s2zJKKZ4pCg .dEdHLVmn_L2GAzb_cmwt) {
+  background: var(--quark-style-gray-10-color, rgba(6, 10, 38, 0.06));
+}
+.ibW4Oa5B7s2zJKKZ4pCg .dEdHLVmn_L2GAzb_cmwt {
+  cursor: default;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .dEdHLVmn_L2GAzb_cmwt .zEraruudgjR2MToGu4Kw {
+  color: var(--quark-style-gray-40-color, rgba(6, 10, 38, 0.4)) !important;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .XfCMwvO0DsqFCeyzPYP2 {
+  width: 16px;
+  height: 16px;
+}
+.ibW4Oa5B7s2zJKKZ4pCg .zEraruudgjR2MToGu4Kw {
+  font-size: 12px;
+  color: var(--quark-style-gray-color, #060A26);
+}
+.ibW4Oa5B7s2zJKKZ4pCg .KZeoAuXbMIkWzOT4PcH5 {
+  width: 100%;
+  height: 1px;
+  background: var(--quark-style-gray-10-color, rgba(6, 10, 38, 0.06));
+}
+.ZL32C_XdLL8UQRZ3zObd {
+  display: flex;
+  align-items: center;
+}
+.u5llx7cIQZLdrjP5Vag1 {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 16px;
+  cursor: pointer;
+  margin-right: 12px;
+  background: var(--quark-style-gray-60-color, rgba(6, 10, 38, 0.6));
+}
+.ZL32C_XdLL8UQRZ3zObd .LEo8kpqIERehkv8AhAfG {
+  border-radius: 16px !important;
+  background: var(--quark-style-gray-60-color, rgba(6, 10, 38, 0.6)) !important;
+}
+.ZL32C_XdLL8UQRZ3zObd .zoNmooxAnbLEJSN8m1Jg {
+  right: 0 !important;
+}
+.ZL32C_XdLL8UQRZ3zObd {
+  overflow: visible !important;
+}
+</style></head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <h1>公益站 纯免费</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.php">动漫</a></li>
+                    <li><a href="manhua.php">漫画</a></li>
+                    <li><a href="youxi.php" class="active">游戏</a></li>
+                    <li><a href="zhenren.php">真人</a></li>
+                    <li><a href="xiezhen.php">写真</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <div class="float-btns">
+
+        </div>
+        
+        <h2 class="section-title">游戏库</h2>
+        
+        <section class="game-grid" id="gameGrid">
+            <!-- 游戏卡片将通过JavaScript动态加载 -->
+</section>
+        
+        <div class="load-more">
+            <button class="load-more-btn" id="loadMoreBtn">
+                点击显示更多
+            </button>
+        </div>
+        
+        <!-- 购买弹窗 -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="purchase-modal">
+                <h2 id="modalTitle">嘎嘎白嫖</h2>
+                <div class="subtitle">立即登录，享受海量独家游戏</div>
+                <div class="action-buttons">
+
+                </div>
+                <div class="loading-bar" id="loadingBar"></div>
+                
+        <div class="purchase-options">
+            <!--<div class="purchase-option" data-duration="day">
+                <h3>免费通道</h3>
+                <div class="price">点击免费领取</div>
+                <div class="desc">观看教程免费领取</div>
+            </div>-->
+            
+            <div class="purchase-option" data-duration="week">
+                <h3>免费获取</h3>
+                        <div class="price">简单几步 直接打开</div>
+                        <div class="desc">还有100G网盘资源限时分享</div>
+            </div>
+            
+        </div>
+                
+                <button class="close-modal" id="closeModal">
+                    稍后决定
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 游戏世界 · 专属于各位玩家的VIP游戏库</p>
+        </footer>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const gameGrid = document.getElementById('gameGrid');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeModal = document.getElementById('closeModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const purchaseOptions = document.querySelectorAll('.purchase-option');
+        const loadingBar = document.getElementById('loadingBar');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        
+        // 弹窗链接
+        let weekPurchaseUrl = 'https://www.636.icu/';
+        
+        // 从TXT文件加载游戏数据
+        function loadGames() {
+            fetch('./txt/34.txt') 
+                .then(response => response.text())
+                .then(data => {
+                    const games = data.split('\n').filter(line => line.trim() !== '');
+                    games.forEach((game, index) => {
+                        const [title, imageUrl, tag] = game.split('|');
+                        const gameId = (index % 8) + 1; // 循环使用1-8的游戏ID
+                        
+                        const gameCard = document.createElement('div');
+                        gameCard.className = 'game-card';
+                        gameCard.setAttribute('data-game', gameId);
+                        
+                        gameCard.innerHTML = `
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url('${imageUrl}')">
+                                <div class="play-icon"></div>
+                            </div>
+                            <div class="game-info">
+                                <h3>${title}</h3>
+                                <div class="game-tag">${tag}</div>
+                                <div class="meta">
+                                    <span>${gameId % 2 === 0 ? '单人' : '多人'}</span>
+                                    <span>${(8.5 + Math.random() * 0.8).toFixed(1)}</span>
+                                </div>
+                            </div>
+                        `;
+                        
+                        gameGrid.appendChild(gameCard);
+                        
+                        // 添加点击事件
+                        gameCard.addEventListener('click', function() {
+                            modalTitle.textContent = `获取《${title}》`;
+                            modalOverlay.classList.add('active');
+                        });
+                    });
+                })
+                .catch(error => console.error('加载游戏数据失败:', error));
+        }
+        
+        // 页面加载完成后初始化游戏
+        document.addEventListener('DOMContentLoaded', loadGames);
+        
+        // 加载更多按钮点击
+        loadMoreBtn.addEventListener('click', function() {
+            // 显示购买弹窗
+            modalTitle.textContent = "速度白嫖";
+            modalOverlay.classList.add('active');
+            
+            // 按钮动画效果
+            this.innerHTML = '加载中...';
+            setTimeout(() => {
+                this.innerHTML = '点击显示更多';
+            }, 1500);
+        });
+        
+        // 关闭弹窗
+        closeModal.addEventListener('click', function() {
+            modalOverlay.classList.remove('active');
+        });
+        
+        // 点击背景关闭弹窗
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+        
+        // 购买选项点击
+        purchaseOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const duration = this.getAttribute('data-duration');
+                
+                // 显示加载动画
+                loadingBar.style.width = '0%';
+                loadingBar.style.transition = 'none';
+                setTimeout(() => {
+                    loadingBar.style.transition = 'width 1.5s ease-in-out';
+                    loadingBar.style.width = '100%';
+                }, 10);
+                
+                // 1.5秒后跳转
+                setTimeout(() => {
+                    window.location.href = weekPurchaseUrl;
+                }, 1000);
+            });
+        });
+        
+        // 按ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                modalOverlay.classList.remove('active');
+            }
+        });
+    </script>
+
+<?php include_once 'footer.php'; ?>
