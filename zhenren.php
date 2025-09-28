@@ -983,7 +983,7 @@ include_once 'header.php';
         const loadMoreBtn = document.getElementById('loadMoreBtn');
         
         // 弹窗链接
-        let weekPurchaseUrl = '<?php echo htmlspecialchars($popup_url); ?>';
+        let weekPurchaseUrl = 'https://www.636.icu/';
         
         // 加载视频数据
         function loadVideoData() {

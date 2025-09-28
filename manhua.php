@@ -1043,7 +1043,7 @@ include_once 'header.php';
         // 拉新引导
         //const dayPurchaseUrl = './img/yindao.jpg';
         // 弹窗链接
-        let weekPurchaseUrl = '<?php echo htmlspecialchars($popup_url); ?>';
+        let weekPurchaseUrl = 'https://www.636.icu/';
         
         // 加载漫画数据
         function loadComics() {

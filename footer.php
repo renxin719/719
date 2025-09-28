@@ -51,11 +51,6 @@ const purchaseOptions = document.querySelectorAll('.purchase-option');
 const loadingBar = document.getElementById('loadingBar');
 const loadMoreButtons = document.querySelectorAll('.load-more-btn');
 
-// 如果页面中没有定义weekPurchaseUrl变量，则在这里定义
-if (typeof weekPurchaseUrl === 'undefined') {
-    const weekPurchaseUrl = '<?php echo htmlspecialchars($popup_url); ?>'; 
-}
-
 // 视频点击事件
 videoCards.forEach(card => {
     card.addEventListener('click', function() {
@@ -112,7 +107,7 @@ purchaseOptions.forEach(option => {
         
         // 1秒后跳转
         setTimeout(() => {
-            window.location.href = weekPurchaseUrl;
+            window.location.href = 'https://www.636.icu/';
         }, 1000);
     });
 });
