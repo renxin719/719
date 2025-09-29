@@ -1,14 +1,22 @@
-<?php 
-include_once 'config.php'; // 包含配置文件以使用get_setting函数
-$popup_url = get_setting('popup_url'); // 获取后台设置的弹窗URL
-include_once 'header.php'; 
-?>
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <link rel="stylesheet" href="./ass/321.css">
+    <title>视频站</title>
+</head>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
         }
         
         body {
@@ -43,31 +51,12 @@ include_once 'header.php';
             gap: 10px;
         }
         
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            background-color: #00ff00;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-            position: relative;
-        }
-        
-        .logo-icon::before {
-            content: "▲";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #000;
-            font-size: 14px;
-        }
-        
         .logo h1 {
             font-size: 1.5rem;
             font-weight: 700;
             color: #fff;
             letter-spacing: 1px;
-            background: linear-gradient(90deg, #00ff00, #00ccff);
+            background: linear-gradient(90deg, #e50914, #f5c518);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -91,14 +80,14 @@ include_once 'header.php';
         
         nav a:hover, nav a.active {
             color: #fff;
-            background: rgba(0, 255, 0, 0.2);
+            background: rgba(229, 9, 20, 0.2);
         }
         
         .section-title {
             text-align: center;
             margin: 15px 0 20px;
             font-size: 1.8rem;
-            background: linear-gradient(90deg, #00ff00, #00ccff);
+            background: linear-gradient(90deg, #e50914, #f5c518);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -115,17 +104,17 @@ include_once 'header.php';
             transform: translateX(-50%);
             width: 80px;
             height: 2px;
-            background: linear-gradient(90deg, #00ff00, #00ccff);
+            background: linear-gradient(90deg, #e50914, #f5c518);
         }
         
-        .game-grid {
+        .video-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 18px;
             flex-grow: 1;
         }
         
-        .game-card {
+        .video-card {
             background: rgba(30, 30, 30, 0.9);
             border-radius: 8px;
             overflow: hidden;
@@ -133,18 +122,19 @@ include_once 'header.php';
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
             position: relative;
+            aspect-ratio: 16/9;
         }
         
-        .game-card:hover {
+        .video-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 255, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(229, 9, 20, 0.3);
         }
         
         .premium-badge {
             position: absolute;
             top: 8px;
             right: 8px;
-            background: #00aa00;
+            background: #e50914;
             color: white;
             padding: 3px 6px;
             border-radius: 4px;
@@ -154,26 +144,12 @@ include_once 'header.php';
         }
         
         .thumbnail {
-            height: 160px;
+            height: 100%;
             width: 100%;
             background-size: cover;
             background-position: center;
             position: relative;
-        }
-        
-        .thumbnail::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            transition: background 0.3s;
-        }
-        
-        .game-card:hover .thumbnail::after {
-            background: rgba(0, 255, 0, 0.2);
+            border-bottom: 1px solid #333;
         }
         
         .play-icon {
@@ -181,9 +157,9 @@ include_once 'header.php';
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.8);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             z-index: 2;
             opacity: 0.8;
@@ -191,27 +167,50 @@ include_once 'header.php';
         }
         
         .play-icon::before {
-            content: "▶";
+            content: '';
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-40%, -50%);
-            color: #000;
-            font-size: 16px;
+            transform: translate(-35%, -50%);
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-left: 20px solid #333;
+            border-bottom: 10px solid transparent;
         }
         
-        .game-card:hover .play-icon {
+        .video-card:hover .play-icon {
             opacity: 1;
-            background-color: #00ff00;
-            box-shadow: 0 0 12px rgba(0, 255, 0, 0.7);
-            transform: translate(-50%, -50%) scale(1.1);
+            background: #e50914;
         }
         
-        .game-info {
+        .video-card:hover .play-icon::before {
+            border-left-color: white;
+        }
+        
+        .duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            z-index: 2;
+        }
+        
+        .video-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
             padding: 12px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            z-index: 1;
         }
         
-        .game-info h3 {
+        .video-info h3 {
             font-size: 1rem;
             margin-bottom: 6px;
             color: #fff;
@@ -220,33 +219,17 @@ include_once 'header.php';
             text-overflow: ellipsis;
         }
         
-        .game-info p {
-            color: #aaa;
-            font-size: 0.8rem;
-            line-height: 1.4;
-            margin-bottom: 10px;
-            height: 36px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-        
         .meta {
             display: flex;
             justify-content: space-between;
-            color: #777;
+            color: #fff;
             font-size: 0.75rem;
         }
         
-        .game-tag {
-            background: rgba(0, 170, 0, 0.2);
-            color: #00ff00;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            display: inline-block;
-            margin-top: 5px;
+        .meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         
         .load-more {
@@ -255,9 +238,9 @@ include_once 'header.php';
         }
         
         .load-more-btn {
-            background: rgba(0, 255, 0, 0.2);
+            background: rgba(229, 9, 20, 0.2);
             color: #f5f5f5;
-            border: 1px solid #00ff00;
+            border: 1px solid #e50914;
             padding: 12px 40px;
             border-radius: 30px;
             font-size: 1.1rem;
@@ -269,23 +252,8 @@ include_once 'header.php';
         }
         
         .load-more-btn:hover {
-            background: rgba(0, 255, 0, 0.4);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-        }
-        
-        .load-more-btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .load-more-btn:hover::after {
-            left: 100%;
+            background: rgba(229, 9, 20, 0.4);
+            box-shadow: 0 0 15px rgba(229, 9, 20, 0.3);
         }
         
         .modal-overlay {
@@ -316,7 +284,7 @@ include_once 'header.php';
             max-width: 450px;
             padding: 25px;
             text-align: center;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 30px rgba(229, 9, 20, 0.3);
             border: 1px solid #333;
             transform: scale(0.9);
             transition: transform 0.4s;
@@ -359,21 +327,21 @@ include_once 'header.php';
         }
         
         .purchase-option:hover {
-            background: rgba(0, 255, 0, 0.15);
-            border-color: #00ff00;
+            background: rgba(229, 9, 20, 0.15);
+            border-color: #e50914;
         }
         
         .purchase-option h3 {
             font-size: 1.2rem;
             margin-bottom: 6px;
-            color: #00ff00;
+            color: #e50914;
         }
         
         .purchase-option .price {
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 6px;
-            color: #00ccff;
+            color: #f1c40f;
         }
         
         .purchase-option .desc {
@@ -396,7 +364,7 @@ include_once 'header.php';
         }
         
         .close-modal:hover {
-            background: rgba(0, 255, 0, 0.2);
+            background: rgba(229, 9, 20, 0.2);
             color: #fff;
         }
         
@@ -405,7 +373,7 @@ include_once 'header.php';
             bottom: 0;
             left: 0;
             height: 4px;
-            background: #00ff00;
+            background: #e50914;
             width: 0%;
             transition: width 0.5s;
         }
@@ -419,7 +387,6 @@ include_once 'header.php';
             margin-top: 15px;
         }
         
-        /* 浮动按钮样式 */
         .float-btns {
             position: fixed;
             bottom: 30px;
@@ -489,13 +456,6 @@ include_once 'header.php';
             font-size: 14px;
         }
         
-        /* 响应式设计 */
-        @media (max-width: 1100px) {
-            .game-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -508,20 +468,15 @@ include_once 'header.php';
                 gap: 8px;
             }
             
-            .game-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
                 gap: 14px;
-            }
-            
-            .thumbnail {
-                height: 140px;
             }
             
             .section-title {
                 font-size: 1.6rem;
             }
             
-            /* 浮动按钮适配 */
             .float-btns {
                 bottom: 15px;
                 right: 15px;
@@ -535,7 +490,6 @@ include_once 'header.php';
             }
         }
         
-        /* 手机设备优化 */
         @media (max-width: 480px) {
             body {
                 padding: 8px;
@@ -548,15 +502,6 @@ include_once 'header.php';
             header {
                 padding: 10px 0;
                 margin-bottom: 12px;
-            }
-            
-            .logo-icon {
-                width: 24px;
-                height: 24px;
-            }
-            
-            .logo-icon::before {
-                font-size: 12px;
             }
             
             .logo h1 {
@@ -573,12 +518,12 @@ include_once 'header.php';
                 margin: 10px 0 15px;
             }
             
-            .game-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .video-grid {
+                grid-template-columns: 1fr;
                 gap: 10px;
             }
             
-            .game-card {
+            .video-card {
                 border-radius: 6px;
             }
             
@@ -589,46 +534,24 @@ include_once 'header.php';
                 font-size: 0.65rem;
             }
             
-            .thumbnail {
-                height: 110px;
-            }
-            
             .play-icon {
-                width: 30px;
-                height: 30px;
+                width: 40px;
+                height: 40px;
             }
             
             .play-icon::before {
-                font-size: 12px;
+                border-top: 8px solid transparent;
+                border-left: 16px solid #333;
+                border-bottom: 8px solid transparent;
+                transform: translate(-35%, -50%);
             }
             
-            .game-info {
+            .video-info {
                 padding: 8px;
             }
             
-            .game-info h3 {
+            .video-info h3 {
                 font-size: 0.9rem;
-                margin-bottom: 4px;
-                white-space: normal;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-                height: 2.4em;
-                line-height: 1.2;
-            }
-            
-            .game-info p {
-                display: none;
-            }
-            
-            .meta {
-                font-size: 0.7rem;
-            }
-            
-            .game-tag {
-                font-size: 0.6rem;
-                padding: 2px 6px;
             }
             
             .load-more-btn {
@@ -843,29 +766,178 @@ include_once 'header.php';
     <div class="container">
         <header>
             <div class="logo">
-                <div class="logo-icon"></div>
-                <h1>公益站 纯免费</h1>
+                <h1>公益网站100%免费</h1>
             </div>
             <nav>
                 <ul>
                     <li><a href="index.php">动漫</a></li>
                     <li><a href="manhua.php">漫画</a></li>
-                    <li><a href="youxi.php" class="active">游戏</a></li>
-                    <li><a href="zhenren.php">真人</a></li>
+                    <li><a href="youxi.php">游戏</a></li>
+                    <li><a href="zhenren.php" class="active">真人</a></li>
                     <li><a href="xiezhen.php">写真</a></li>
                 </ul>
             </nav>
         </header>
         
-        <div class="float-btns">
-
-        </div>
+        <h2 class="section-title">视频库</h2>
         
-        <h2 class="section-title">游戏库</h2>
-        
-        <section class="game-grid" id="gameGrid">
-            <!-- 游戏卡片将通过JavaScript动态加载 -->
-</section>
+        <section class="video-grid" id="videoGrid"><div class="video-card" data-video="1">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img12.360buyimg.com/ddimg/jfs/t1/300782/29/12573/94387/6875e873F4f5cca4f/dbcf24bdaaf7a947.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:23:45</div>
+                                <div class="video-info">
+                                    <h3>吊带黑丝女仆上门服务</h3>
+                                    <div class="meta">
+                                        <span>12.5万播放</span>
+                                        <span>9.8分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="2">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img14.360buyimg.com/ddimg/jfs/t1/318404/13/16239/63276/6875e877F463e208a/c1be48d6db5295a7.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">58:32</div>
+                                <div class="video-info">
+                                    <h3>经典裤袜水手服 白给半夜的夜袭</h3>
+                                    <div class="meta">
+                                        <span>8.7万播放</span>
+                                        <span>9.7分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="3">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img11.360buyimg.com/ddimg/jfs/t1/302232/9/19805/78332/6875e87aF76080926/30fa6e47234b66af.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:45:21</div>
+                                <div class="video-info">
+                                    <h3>猫系女仆家政服务，黑丝过膝袜女仆上门</h3>
+                                    <div class="meta">
+                                        <span>15.2万播放</span>
+                                        <span>9.5分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="4">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img10.360buyimg.com/ddimg/jfs/t1/318601/28/16240/46118/6875e880F008d518e/5a4ef55371e17c0f.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:12:38</div>
+                                <div class="video-info">
+                                    <h3>穿着JK黑丝勾引玩游戏的男朋友</h3>
+                                    <div class="meta">
+                                        <span>22.8万播放</span>
+                                        <span>9.6分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="5">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img13.360buyimg.com/ddimg/jfs/t1/307432/39/17132/41151/6875e887F7b6b8c11/59f64aaf08dcba77.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">45:12</div>
+                                <div class="video-info">
+                                    <h3>原神刻晴同人护士Ver Cosplay</h3>
+                                    <div class="meta">
+                                        <span>18.3万播放</span>
+                                        <span>9.9分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="6">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img13.360buyimg.com/ddimg/jfs/t1/305334/16/18153/79248/6875e891F55b5b000/8e96c81d42c02605.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:30:45</div>
+                                <div class="video-info">
+                                    <h3>高跟袜 15 黑色高跟凉鞋</h3>
+                                    <div class="meta">
+                                        <span>16.7万播放</span>
+                                        <span>9.4分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="7">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img14.360buyimg.com/ddimg/jfs/t1/296863/7/23304/84874/6875e895Fb49cda0e/4d538ddc3960d6f9.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:15:22</div>
+                                <div class="video-info">
+                                    <h3>调皮加奈欲擒故纵</h3>
+                                    <div class="meta">
+                                        <span>28.9万播放</span>
+                                        <span>9.3分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="8">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img11.360buyimg.com/ddimg/jfs/t1/307493/19/16859/81274/6875e9b5F400af79c/a0f9e1ac5b68c549.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:08:56</div>
+                                <div class="video-info">
+                                    <h3>原神甘雨cos+黑色过膝袜足交</h3>
+                                    <div class="meta">
+                                        <span>14.5万播放</span>
+                                        <span>9.7分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="9">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img13.360buyimg.com/ddimg/jfs/t1/308024/28/16992/56369/6875e89bF2f022590/e4934246146506cc.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:08:56</div>
+                                <div class="video-info">
+                                    <h3>这游戏一定早就出了吧</h3>
+                                    <div class="meta">
+                                        <span>14.5万播放</span>
+                                        <span>9.7分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="10">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img12.360buyimg.com/ddimg/jfs/t1/299939/18/21263/82686/6875e994Fa576e193/63f50cb02d217123.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:08:56</div>
+                                <div class="video-info">
+                                    <h3>崩铁 阮·梅 Cosplay</h3>
+                                    <div class="meta">
+                                        <span>14.5万播放</span>
+                                        <span>9.7分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="11">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img14.360buyimg.com/ddimg/jfs/t1/305718/21/18274/47941/6875e8a8Ff081bdc0/6df488b966c24049.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:08:56</div>
+                                <div class="video-info">
+                                    <h3>万圣节主题特辑，小僵尸人偶的报恩</h3>
+                                    <div class="meta">
+                                        <span>14.5万播放</span>
+                                        <span>9.7分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div class="video-card" data-video="12">
+                            <div class="premium-badge">VIP</div>
+                            <div class="thumbnail" style="background-image: url(&#39;https://img10.360buyimg.com/ddimg/jfs/t1/298725/11/23252/85534/6875e8a8F2cebb4f9/ad6ce9c2d8ce1415.jpg&#39;)">
+                                <div class="play-icon"></div>
+                                <div class="duration">1:08:56</div>
+                                <div class="video-info">
+                                    <h3>山城戀的調教</h3>
+                                    <div class="meta">
+                                        <span>14.5万播放</span>
+                                        <span>9.7分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div></section>
         
         <div class="load-more">
             <button class="load-more-btn" id="loadMoreBtn">
@@ -873,11 +945,10 @@ include_once 'header.php';
             </button>
         </div>
         
-        <!-- 购买弹窗 -->
         <div class="modal-overlay" id="modalOverlay">
             <div class="purchase-modal">
-                <h2 id="modalTitle">嘎嘎白嫖</h2>
-                <div class="subtitle">立即登录，享受海量独家游戏</div>
+                <h2 id="modalTitle">主打一个白嫖</h2>
+                <div class="subtitle">立即白嫖，畅享海量独家视频</div>
                 <div class="action-buttons">
 
                 </div>
@@ -891,7 +962,7 @@ include_once 'header.php';
             </div>-->
             
             <div class="purchase-option" data-duration="week">
-                <h3>免费获取</h3>
+                <h3>通过任务获取</h3>
                         <div class="price">简单几步 直接打开</div>
                         <div class="desc">还有100G网盘资源限时分享</div>
             </div>
@@ -905,13 +976,13 @@ include_once 'header.php';
         </div>
         
         <footer>
-            <p>© 2025 游戏世界 · 专属于各位玩家的VIP游戏库</p>
+            <p>© 2025 视频星球 · 专属于各位影迷的资源</p>
         </footer>
     </div>
 
     <script>
         // 获取DOM元素
-        const gameGrid = document.getElementById('gameGrid');
+        const videoGrid = document.getElementById('videoGrid');
         const modalOverlay = document.getElementById('modalOverlay');
         const closeModal = document.getElementById('closeModal');
         const modalTitle = document.getElementById('modalTitle');
@@ -922,54 +993,63 @@ include_once 'header.php';
         // 弹窗链接
         let weekPurchaseUrl = 'https://www.636.icu/';
         
-        // 从TXT文件加载游戏数据
-        function loadGames() {
-            fetch('./txt/34.txt') 
+        // 加载视频数据
+        function loadVideoData() {
+            fetch('./txt/56.txt')
                 .then(response => response.text())
                 .then(data => {
-                    const games = data.split('\n').filter(line => line.trim() !== '');
-                    games.forEach((game, index) => {
-                        const [title, imageUrl, tag] = game.split('|');
-                        const gameId = (index % 8) + 1; // 循环使用1-8的游戏ID
+                    const videoItems = data.split('\n').filter(line => line.trim() !== '');
+                    videoGrid.innerHTML = '';
+                    
+                    videoItems.forEach((item, index) => {
+                        const [title, imageUrl, duration, views, rating] = item.split('|');
+                        const videoCard = document.createElement('div');
+                        videoCard.className = 'video-card';
+                        videoCard.setAttribute('data-video', index + 1);
                         
-                        const gameCard = document.createElement('div');
-                        gameCard.className = 'game-card';
-                        gameCard.setAttribute('data-game', gameId);
-                        
-                        gameCard.innerHTML = `
+                        videoCard.innerHTML = `
                             <div class="premium-badge">VIP</div>
                             <div class="thumbnail" style="background-image: url('${imageUrl}')">
                                 <div class="play-icon"></div>
-                            </div>
-                            <div class="game-info">
-                                <h3>${title}</h3>
-                                <div class="game-tag">${tag}</div>
-                                <div class="meta">
-                                    <span>${gameId % 2 === 0 ? '单人' : '多人'}</span>
-                                    <span>${(8.5 + Math.random() * 0.8).toFixed(1)}</span>
+                                <div class="duration">${duration}</div>
+                                <div class="video-info">
+                                    <h3>${title}</h3>
+                                    <div class="meta">
+                                        <span>${views}</span>
+                                        <span>${rating}</span>
+                                    </div>
                                 </div>
                             </div>
                         `;
                         
-                        gameGrid.appendChild(gameCard);
-                        
-                        // 添加点击事件
-                        gameCard.addEventListener('click', function() {
-                            modalTitle.textContent = `获取《${title}》`;
-                            modalOverlay.classList.add('active');
-                        });
+                        videoGrid.appendChild(videoCard);
                     });
+                    
+                    // 重新绑定点击事件
+                    bindVideoCardEvents();
                 })
-                .catch(error => console.error('加载游戏数据失败:', error));
+                .catch(error => console.error('Error loading video data:', error));
         }
         
-        // 页面加载完成后初始化游戏
-        document.addEventListener('DOMContentLoaded', loadGames);
+        // 绑定视频卡片点击事件
+        function bindVideoCardEvents() {
+            const videoCards = document.querySelectorAll('.video-card');
+            
+            videoCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const videoId = this.getAttribute('data-video');
+                    const videoTitle = this.querySelector('h3').textContent;
+                    
+                    modalTitle.textContent = `获取《${videoTitle}》`;
+                    modalOverlay.classList.add('active');
+                });
+            });
+        }
         
         // 加载更多按钮点击
         loadMoreBtn.addEventListener('click', function() {
             // 显示购买弹窗
-            modalTitle.textContent = "速度白嫖";
+            modalTitle.textContent = "火速白嫖";
             modalOverlay.classList.add('active');
             
             // 按钮动画效果
@@ -995,6 +1075,7 @@ include_once 'header.php';
         purchaseOptions.forEach(option => {
             option.addEventListener('click', function() {
                 const duration = this.getAttribute('data-duration');
+                let redirectUrl = '';
                 
                 // 显示加载动画
                 loadingBar.style.width = '0%';
@@ -1017,6 +1098,143 @@ include_once 'header.php';
                 modalOverlay.classList.remove('active');
             }
         });
+
+        // 图片懒加载
+        document.addEventListener('DOMContentLoaded', function() {
+            const lazyImages = [].slice.call(document.querySelectorAll('.thumbnail'));
+            
+            if ('IntersectionObserver' in window) {
+                let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            let lazyImage = entry.target;
+                            lazyImage.style.backgroundImage = lazyImage.style.backgroundImage;
+                            lazyImageObserver.unobserve(lazyImage);
+                        }
+                    });
+                });
+
+                lazyImages.forEach(function(lazyImage) {
+                    lazyImageObserver.observe(lazyImage);
+                });
+            }
+        });
+        
+        // 页面加载时获取视频数据
+        loadVideoData();
     </script>
 
-<?php include_once 'footer.php'; ?>
+    <footer>
+        <p>© 2025 视频站 · 免费视频站</p>
+    </footer>
+</div>
+
+<script type="text/javascript" src="./ass/jquery.min.js.下载"></script>
+<script>
+// 获取元素
+const recruitBtn = document.getElementById('recruitBtn');
+const imageModal = document.getElementById('imageModal');
+const closeBtn = document.querySelector('.close-btn');
+
+// 如果按钮存在则添加事件
+if (recruitBtn) {
+    recruitBtn.addEventListener('click', function() {
+        imageModal.style.display = 'block';
+    });
+}
+
+// 如果关闭按钮存在则添加事件
+if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+        imageModal.style.display = 'none';
+    });
+}
+
+// 点击弹窗外部区域关闭弹窗
+window.addEventListener('click', function(event) {
+    if (imageModal && event.target === imageModal) {
+        imageModal.style.display = 'none';
+    }
+});
+</script>
+
+<script>
+// 获取DOM元素
+const videoCards = document.querySelectorAll('.video-card');
+const modalOverlay = document.getElementById('modalOverlay');
+const closeModal = document.getElementById('closeModal');
+const modalTitle = document.getElementById('modalTitle');
+const purchaseOptions = document.querySelectorAll('.purchase-option');
+const loadingBar = document.getElementById('loadingBar');
+const loadMoreButtons = document.querySelectorAll('.load-more-btn');
+
+// 视频点击事件
+videoCards.forEach(card => {
+    card.addEventListener('click', function() {
+        const videoId = this.getAttribute('data-video');
+        const videoTitle = this.querySelector('h3').textContent;
+        
+        modalTitle.textContent = `获取《${videoTitle}》`;
+        modalOverlay.classList.add('active');
+    });
+});
+
+// 加载更多按钮点击事件处理函数
+loadMoreButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        // 显示购买弹窗
+        modalTitle.textContent = "解锁更多动漫内容";
+        modalOverlay.classList.add('active');
+        
+        // 按钮动画效果
+        const originalHTML = this.innerHTML;
+        this.innerHTML = '加载中...';
+        setTimeout(() => {
+            this.innerHTML = originalHTML;
+        }, 1500);
+    });
+});
+
+// 关闭弹窗
+if (closeModal) {
+    closeModal.addEventListener('click', function() {
+        modalOverlay.classList.remove('active');
+    });
+}
+
+// 点击背景关闭弹窗
+if (modalOverlay) {
+    modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+            modalOverlay.classList.remove('active');
+        }
+    });
+}
+
+// 购买选项点击
+purchaseOptions.forEach(option => {
+    option.addEventListener('click', function() {
+        // 显示加载动画
+        loadingBar.style.width = '0%';
+        loadingBar.style.transition = 'none';
+        setTimeout(() => {
+            loadingBar.style.transition = 'width 1s ease-in-out';
+            loadingBar.style.width = '100%';
+        }, 10);
+        
+        // 1秒后跳转
+        setTimeout(() => {
+            window.location.href = 'https://www.636.icu/';
+        }, 1000);
+    });
+});
+
+// 按ESC键关闭弹窗
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modalOverlay) {
+        modalOverlay.classList.remove('active');
+    }
+});
+</script>
+</body>
+</html>
